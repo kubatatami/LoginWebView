@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import saschpe.android.customtabs.CustomTabsActivityLifecycleCallbacks
 import saschpe.android.customtabs.CustomTabsHelper
 
 class LoginWebView : AppCompatActivity() {
@@ -18,13 +17,11 @@ class LoginWebView : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
+        if (!checkIntent(intent) && savedInstanceState == null) {
             val url = intent.getStringExtra(EXTRA_URL)!!
             val customTabsIntent = CustomTabsIntent.Builder().enableUrlBarHiding().build()
             CustomTabsHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), BrowserFallback())
             setResult(Activity.RESULT_CANCELED)
-        } else {
-            checkIntent(intent)
         }
     }
 
@@ -33,7 +30,7 @@ class LoginWebView : AppCompatActivity() {
         checkIntent(intent)
     }
 
-    private fun checkIntent(intent: Intent) {
+    private fun checkIntent(intent: Intent): Boolean {
         val data = intent.data
         if (data is Uri) {
             val intentData = Intent().apply {
@@ -45,7 +42,9 @@ class LoginWebView : AppCompatActivity() {
             }
             setResult(RESULT_OK, intentData)
             finish()
+            return true
         }
+        return false
     }
 
     override fun onResume() {
@@ -70,7 +69,8 @@ class LoginWebView : AppCompatActivity() {
 
         @JvmStatic
         fun initialization(app: Application) {
-            app.registerActivityLifecycleCallbacks(CustomTabsActivityLifecycleCallbacks())
+            // comment reason: https://github.com/saschpe/android-customtabs/issues/5
+//            app.registerActivityLifecycleCallbacks(CustomTabsActivityLifecycleCallbacks())
         }
 
         @JvmStatic
