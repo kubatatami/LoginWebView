@@ -18,15 +18,22 @@ class LoginWebView : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val url = intent.getStringExtra(EXTRA_URL)!!
-
-        val customTabsIntent = CustomTabsIntent.Builder().enableUrlBarHiding().build()
-        CustomTabsHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), BrowserFallback())
-        setResult(Activity.RESULT_CANCELED)
+        if (savedInstanceState == null) {
+            val url = intent.getStringExtra(EXTRA_URL)!!
+            val customTabsIntent = CustomTabsIntent.Builder().enableUrlBarHiding().build()
+            CustomTabsHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), BrowserFallback())
+            setResult(Activity.RESULT_CANCELED)
+        } else {
+            checkIntent(intent)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        checkIntent(intent)
+    }
+
+    private fun checkIntent(intent: Intent) {
         val data = intent.data
         if (data is Uri) {
             val intentData = Intent().apply {
